@@ -487,7 +487,16 @@ footer { text-align: center; color: var(--muted); font-size: 14px; padding: 40px
     node.addEventListener("animationiteration", function () { varyGlow(false); });
   });
 
+  var publicMediaBase = window.location.hostname === "filmharness.github.io"
+    ? "https://media.githubusercontent.com/media/FilmHarness/FilmHarness.github.io/main/" : "";
   var teaser = document.getElementById("teaser-video");
+  // Branch-based Pages deployments contain LFS pointers, so resolve the public media stream.
+  if (publicMediaBase && !teaser.hasAttribute("data-bundled-media")) {
+    teaser.src = publicMediaBase + "videos/teaser.mp4";
+    document.querySelectorAll('a[href="videos/teaser.mp4"]').forEach(function (link) {
+      link.href = publicMediaBase + "videos/teaser.mp4";
+    });
+  }
   var chapterButtons = Array.from(document.querySelectorAll(".chapter"));
   var toggle = document.getElementById("teaser-toggle");
   function seekTeaser(seconds, absolute) {
@@ -606,7 +615,7 @@ footer { text-align: center; color: var(--muted); font-size: 14px; padding: 40px
       video.controls = true; video.muted = true; video.preload = "none"; video.playsInline = true;
       video.setAttribute("aria-label", m[1] + ": " + story.label + " (" + BACKBONE[state.backbone] + ")");
       video.poster = ours ? "assets/poster_" + id + ".jpg" : "assets/baselines/" + id + "__" + m[0] + ".jpg";
-      video.src = ours ? "videos/" + id + ".mp4" : "videos/baselines/" + id + "__" + m[0] + ".mp4";
+      video.src = publicMediaBase + (ours ? "videos/" + id + ".mp4" : "videos/baselines/" + id + "__" + m[0] + ".mp4");
       var label = document.createElement("div"); label.className = "label";
       var name = document.createElement("span"); name.className = "name"; name.textContent = m[1];
       label.appendChild(name);

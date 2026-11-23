@@ -15,10 +15,11 @@ def build():
     shutil.copytree(ROOT / 'assets', OUT / 'assets', dirs_exist_ok=True)
     (OUT / '.nojekyll').touch()
     page = (ROOT / 'index.html').read_text()
-    original = 'video.src = ours ? "videos/" + id + ".mp4" : "videos/baselines/" + id + "__" + m[0] + ".mp4";'
+    original = 'video.src = publicMediaBase + (ours ? "videos/" + id + ".mp4" : "videos/baselines/" + id + "__" + m[0] + ".mp4");'
     replacement = 'video.src = ' + json.dumps(MEDIA) + ' + (ours ? "videos/" + id + ".mp4" : "videos/baselines/" + id + "__" + m[0] + ".mp4");'
     assert page.count(original) == 1, 'Comparison video assignment changed; update the builder.'
-    (OUT / 'index.html').write_text(page.replace(original, replacement))
+    page = page.replace(original, replacement).replace('<video id="teaser-video"', '<video data-bundled-media id="teaser-video"')
+    (OUT / 'index.html').write_text(page)
     # Copy a real local teaser or resolve its Git LFS pointer during Actions checkout.
     source = ROOT / 'videos/teaser.mp4'
     target = OUT / 'videos/teaser.mp4'
