@@ -33,8 +33,10 @@ All MP4 files are tracked with Git LFS. The complete media collection is approxi
 
 ## Publication
 
-This push preserves the repository's private visibility and does not enable a public site or any automatic deployment workflow.
+The public site is built and deployed by `.github/workflows/pages.yml`. In repository **Settings → Pages**, select **GitHub Actions** as the source to enable deployment. Pushes to `main` then update the site automatically.
 
-GitHub Pages cannot serve this entire 6 GB collection directly, and Git LFS pointers are not playable video files. For publication, keep the page, figures, paper, and teaser on Pages, and serve complete films from a suitable public media host or public GitHub Release. Configure those media URLs before enabling Pages. Do not place authentication tokens in browser code.
+`scripts/build_pages.py` prepares a lightweight Pages artifact containing the page, images, paper, and an actual playable teaser. It resolves the teaser's Git LFS pointer and verifies its SHA-256. Complete films load directly from the public Git LFS media endpoint, retaining their original encoded video streams. The `main` source page continues to work offline after `git lfs pull`.
+
+The complete 6 GB collection is not bundled into the Pages artifact. Public media downloads consume the repository owner's Git LFS bandwidth allowance. For substantial traffic, migrate complete-film URLs to a dedicated media host or public Release.
 
 The original offline project-page package remains independent of this repository.
