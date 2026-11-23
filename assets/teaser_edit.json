@@ -1,0 +1,178 @@
+{
+  "title": "FilmHarness selected sequences",
+  "duration_seconds": 60,
+  "editing": "Selected excerpts, original speed. Clean cuts within each style, short fades between styles. No synthetic interpolation or frame retouching.",
+  "cuts": [
+    {
+      "index": 1,
+      "genre": "Documentary",
+      "backbone": "Wan2.2",
+      "source_start": 8,
+      "duration": 3.75,
+      "teaser_start": 0.0,
+      "source_filename": "story4_ours_v3_3min.mp4",
+      "source_sha256": "96c5db3fcb1d2a10d33704fe56fc3f2f15cf3ec548fc94258216a22f38adcf15"
+    },
+    {
+      "index": 2,
+      "genre": "Documentary",
+      "backbone": "MiniMax H3",
+      "source_start": 143,
+      "duration": 3.75,
+      "teaser_start": 3.75,
+      "source_filename": "story4_ours_v3_h3_3min.mp4",
+      "source_sha256": "c80f1a1b7ed20c7904638d6b75467b081e6c19001c7a44245b61d9f3f38106d1"
+    },
+    {
+      "index": 3,
+      "genre": "Documentary",
+      "backbone": "Wan2.2",
+      "source_start": 158,
+      "duration": 3.75,
+      "teaser_start": 7.5,
+      "source_filename": "story4_ours_v3_3min.mp4",
+      "source_sha256": "96c5db3fcb1d2a10d33704fe56fc3f2f15cf3ec548fc94258216a22f38adcf15"
+    },
+    {
+      "index": 4,
+      "genre": "Documentary",
+      "backbone": "MiniMax H3",
+      "source_start": 169.5,
+      "duration": 3.75,
+      "teaser_start": 11.25,
+      "source_filename": "story4_ours_v3_h3_3min.mp4",
+      "source_sha256": "c80f1a1b7ed20c7904638d6b75467b081e6c19001c7a44245b61d9f3f38106d1"
+    },
+    {
+      "index": 5,
+      "genre": "Action",
+      "backbone": "MiniMax H3",
+      "source_start": 5.5,
+      "duration": 3.75,
+      "teaser_start": 15.0,
+      "source_filename": "story2_ours_v3_h3_3min.mp4",
+      "source_sha256": "884b05eb7270c7e0865851bc03748dfdf5a62810ebfb08c3da22f9dd5054894a"
+    },
+    {
+      "index": 6,
+      "genre": "Action",
+      "backbone": "Wan2.2",
+      "source_start": 80.5,
+      "duration": 3.75,
+      "teaser_start": 18.75,
+      "source_filename": "story2_ours_v3_3min.mp4",
+      "source_sha256": "9d1b962941d6aa716d968ab4d8036794e450725488e34259240ffcb1f2bbdf8e"
+    },
+    {
+      "index": 7,
+      "genre": "Action",
+      "backbone": "Wan2.2",
+      "source_start": 125.5,
+      "duration": 3.75,
+      "teaser_start": 22.5,
+      "source_filename": "story2_ours_v3_3min.mp4",
+      "source_sha256": "9d1b962941d6aa716d968ab4d8036794e450725488e34259240ffcb1f2bbdf8e"
+    },
+    {
+      "index": 8,
+      "genre": "Action",
+      "backbone": "MiniMax H3",
+      "source_start": 157.5,
+      "duration": 3.75,
+      "teaser_start": 26.25,
+      "source_filename": "story2_ours_v3_h3_3min.mp4",
+      "source_sha256": "884b05eb7270c7e0865851bc03748dfdf5a62810ebfb08c3da22f9dd5054894a"
+    },
+    {
+      "index": 9,
+      "genre": "Stop-motion",
+      "backbone": "Wan2.2",
+      "source_start": 5.5,
+      "duration": 3.75,
+      "teaser_start": 30.0,
+      "source_filename": "story6_3min.mp4",
+      "source_sha256": "9f33295a40c1c0eca210a95fb2e140838f91ad68bf4d0283ec5191c77ef9c19d"
+    },
+    {
+      "index": 10,
+      "genre": "Stop-motion",
+      "backbone": "MiniMax H3",
+      "source_start": 50.2,
+      "duration": 3.75,
+      "teaser_start": 33.75,
+      "source_filename": "story6_h3_3min.mp4",
+      "source_sha256": "973e11ea95f0b141949f6a5650a19aa561bb7237f1529d76d4358676e1b48195"
+    },
+    {
+      "index": 11,
+      "genre": "Stop-motion",
+      "backbone": "MiniMax H3",
+      "source_start": 139.3,
+      "duration": 3.75,
+      "teaser_start": 37.5,
+      "source_filename": "story6_h3_3min.mp4",
+      "source_sha256": "973e11ea95f0b141949f6a5650a19aa561bb7237f1529d76d4358676e1b48195"
+    },
+    {
+      "index": 12,
+      "genre": "Stop-motion",
+      "backbone": "Wan2.2",
+      "source_start": 110.5,
+      "duration": 3.75,
+      "teaser_start": 41.25,
+      "source_filename": "story6_3min.mp4",
+      "source_sha256": "9f33295a40c1c0eca210a95fb2e140838f91ad68bf4d0283ec5191c77ef9c19d"
+    },
+    {
+      "index": 13,
+      "genre": "Sci-fi anime",
+      "backbone": "Wan2.2",
+      "source_start": 20.5,
+      "duration": 3.75,
+      "teaser_start": 45.0,
+      "source_filename": "story5_3min.mp4",
+      "source_sha256": "38c82e7a1b86879a9c989aa2eae5d68bb463c6be6bbf7b1dfcc0741ee15f8a87"
+    },
+    {
+      "index": 14,
+      "genre": "Sci-fi anime",
+      "backbone": "MiniMax H3",
+      "source_start": 35.5,
+      "duration": 3.75,
+      "teaser_start": 48.75,
+      "source_filename": "story5_h3_3min.mp4",
+      "source_sha256": "4b619517454f34547d9e18af62cce7ef494d45e2984beebd8d4b241d29482458"
+    },
+    {
+      "index": 15,
+      "genre": "Sci-fi anime",
+      "backbone": "Wan2.2",
+      "source_start": 155.5,
+      "duration": 3.75,
+      "teaser_start": 52.5,
+      "source_filename": "story5_3min.mp4",
+      "source_sha256": "38c82e7a1b86879a9c989aa2eae5d68bb463c6be6bbf7b1dfcc0741ee15f8a87"
+    },
+    {
+      "index": 16,
+      "genre": "Sci-fi anime",
+      "backbone": "MiniMax H3",
+      "source_start": 154.1,
+      "duration": 3.75,
+      "teaser_start": 56.25,
+      "source_filename": "story5_h3_3min.mp4",
+      "source_sha256": "4b619517454f34547d9e18af62cce7ef494d45e2984beebd8d4b241d29482458"
+    }
+  ],
+  "output": {
+    "file": "videos/teaser.mp4",
+    "resolution": [
+      1344,
+      768
+    ],
+    "fps": 24,
+    "encoding": "H.264 High, CRF 14, one-second keyframes, faststart. Original source frame dimensions preserved with padding.",
+    "sha256": "a84fbd49fb0c3f7d90bb0ef24918763c2eeb669828250417c28470cdde936e77",
+    "annotation_position": "top-left"
+  }
+}

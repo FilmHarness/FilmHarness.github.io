@@ -1,0 +1,656 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FilmHarness: Autonomous Film Generation</title>
+<meta name="description" content="FilmHarness: An Agentic Framework for Autonomous Film Generation.">
+<link rel="icon" type="image/png" href="assets/logo.png">
+<style>
+@font-face {
+  font-family: "Outfit";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("assets/fonts/outfit-latin-wght-normal.woff2") format("woff2");
+}
+:root {
+  --bg: #0a0a0c;
+  --band: #111115;
+  --panel: #18181d;
+  --line: #26262d;
+  --line-strong: #3a3a43;
+  --text: #f1f1f3;
+  --body: #c4c4cb;
+  --muted: #8b8b95;
+  --accent: #f2b35a;
+  --accent-deep: #d9902f;
+  --accent-soft: rgba(242, 179, 90, .11);
+  --radius: 14px;
+  --font: "Outfit", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; scroll-padding-top: 64px; }
+body { isolation: isolate; background: var(--bg); color: var(--body); font: 300 17px/1.7 var(--font); -webkit-font-smoothing: antialiased; }
+a { color: var(--text); }
+img, video { display: block; max-width: 100%; }
+b, strong { font-weight: 500; color: var(--text); }
+.wrap { max-width: 1140px; margin: 0 auto; padding: 0 24px; }
+.text { max-width: 800px; margin: 0 auto; }
+.sc { font-variant: small-caps; letter-spacing: .02em; }
+svg.icon { width: 18px; height: 18px; flex: none; }
+code { font: 13.5px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: var(--text); background: rgba(255, 255, 255, .07); padding: 1px 6px; border-radius: 4px; }
+
+/* navigation */
+nav { position: sticky; top: 0; z-index: 20; background: rgba(10, 10, 12, .72); backdrop-filter: blur(14px) saturate(1.3);
+  border-bottom: 1px solid rgba(255, 255, 255, .06); }
+nav .wrap { display: flex; align-items: center; height: 56px; gap: 28px; }
+nav .brand { font-weight: 600; font-size: 18px; color: #fff; text-decoration: none; font-variant: small-caps; letter-spacing: .03em; }
+nav .brand { display: inline-flex; align-items: center; gap: 9px; }
+nav .brand img { width: 28px; height: 28px; object-fit: contain; }
+nav .links { display: flex; gap: 24px; margin-left: auto; }
+nav .links a { color: var(--muted); text-decoration: none; font-size: 15px; transition: color .2s; }
+nav .links a:hover { color: #fff; }
+
+/* hero */
+/* Persistent ambient color pulses use native CSS infinite loops. */
+.hero, .teaser, section, footer { position: relative; z-index: 1; }
+.hero { isolation: isolate; text-align: center; padding: 96px 0 48px; overflow: hidden; }
+.hero::before { content: ""; position: absolute; inset: -40% -20% auto; height: 120%; pointer-events: none; z-index: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(242, 179, 90, .07), transparent 64%); }
+.hero > .wrap { position: relative; z-index: 1; }
+.ambient-lights { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.ambient-light { position: absolute; width: clamp(360px, 48vw, 780px); height: clamp(360px, 66vh, 620px); border-radius: 50%; opacity: .08;
+  background: radial-gradient(ellipse at center, rgba(var(--glow), .46) 0%, rgba(var(--glow), .17) 36%, rgba(var(--glow), 0) 72%);
+  animation: ambient-pulse var(--cycle) ease-in-out var(--phase) infinite;
+  will-change: opacity, transform; }
+.ambient-light:nth-child(1) { --glow: 242, 179, 90; --cycle: 3.8s; --phase: -1.2s; left: -8%; top: -25%; }
+.ambient-light:nth-child(2) { --glow: 164, 127, 250; --cycle: 4.7s; --phase: -2.9s; left: 50%; top: -18%; }
+.ambient-light:nth-child(3) { --glow: 91, 163, 241; --cycle: 5.6s; --phase: -.6s; left: 18%; top: 12%; }
+.ambient-light:nth-child(4) { --glow: 83, 208, 183; --cycle: 6.5s; --phase: -4.1s; left: 64%; top: 46%; }
+.ambient-light:nth-child(5) { --glow: 233, 129, 188; --cycle: 4.3s; --phase: -2.1s; left: -16%; top: 59%; }
+@keyframes ambient-pulse {
+  0%, 100% { opacity: .06; transform: translate3d(0, 0, 0) scale(.90); }
+  25% { opacity: .40; }
+  52% { opacity: .92; transform: translate3d(var(--drift-x, 40px), var(--drift-y, -25px), 0) scale(1.14); }
+  76% { opacity: .36; }
+}
+@keyframes ambient-soft-pulse { 0%, 100% { opacity: .12; } 50% { opacity: .55; } }
+@media (prefers-reduced-motion: reduce) {
+  .ambient-light { animation-name: ambient-soft-pulse; animation-duration: 8s; will-change: opacity; }
+}
+h1 { font-size: clamp(48px, 8vw, 88px); font-weight: 600; line-height: 1; color: #fff; letter-spacing: -.01em; font-variant: small-caps; }
+h1 { display: flex; justify-content: center; align-items: center; gap: clamp(12px, 2vw, 24px); }
+.hero-logo { width: clamp(54px, 8vw, 96px); height: auto; flex: 0 0 auto; object-fit: contain; filter: drop-shadow(0 5px 16px rgba(121, 118, 232, .16)); }
+.subtitle { margin-top: 20px; font-size: clamp(20px, 2.6vw, 29px); font-weight: 300; color: var(--text); letter-spacing: .005em; }
+.meta { margin-top: 22px; font-size: 15.5px; color: var(--muted); letter-spacing: .06em; }
+.buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 32px; }
+.btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 22px; border-radius: 999px; font-size: 16px; font-weight: 400;
+  color: #fff; text-decoration: none; background: rgba(255, 255, 255, .08); border: 1px solid rgba(255, 255, 255, .12); transition: background .2s, border-color .2s, transform .2s; }
+.btn:hover { background: rgba(255, 255, 255, .15); border-color: rgba(255, 255, 255, .25); transform: translateY(-1px); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #1a1206; font-weight: 500; }
+.btn.primary:hover { background: #f6c47a; border-color: #f6c47a; }
+
+/* Selected sequences: a restrained cinema frame with familiar video controls. */
+.teaser { position: relative; }
+.screening { border: 1px solid #343036; border-radius: 19px; overflow: hidden; background: #111114;
+  box-shadow: 0 24px 75px -28px rgba(0, 0, 0, .85); }
+.screening-head { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 16px 22px;
+  background: linear-gradient(110deg, #1d1a17, #151519 65%); border-bottom: 1px solid rgba(255,255,255,.07); }
+.screening-title { font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: .17em; color: #e6d4ba; }
+.screening-meta { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 12px; min-width: 0; }
+.screening-meta .backbones, .screening-meta .duration { white-space: nowrap; }
+.screening-meta span + span { border-left: 1px solid #3a3634; padding-left: 12px; font-variant-numeric: tabular-nums; }
+.teaser video { width: 100%; aspect-ratio: 7 / 4; background: #000; color-scheme: dark; }
+.teaser video:focus-visible { outline: 2px solid var(--accent); outline-offset: -3px; }
+.chapters { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--line); }
+.chapter { position: relative; display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; padding: 14px 18px;
+  text-align: left; color: var(--muted); background: #151518; border: 0; border-right: 1px solid var(--line);
+  cursor: pointer; font-family: inherit; transition: background .2s, color .2s; }
+.chapter:last-child { border-right: 0; }
+.chapter::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 2px; background: transparent; }
+.chapter .number { grid-row: span 2; padding-top: 2px; font-size: 12px; font-variant-numeric: tabular-nums; color: #77727a; }
+.chapter .chapter-name { font-size: 15px; font-weight: 400; }
+.chapter time { font-size: 11px; font-variant-numeric: tabular-nums; letter-spacing: .04em; color: #89838b; }
+.chapter:hover { color: var(--text); background: #1d1c20; }
+.chapter[aria-pressed="true"] { background: #242019; color: #f6cf99; }
+.chapter[aria-pressed="true"]::before { background: var(--accent); }
+.chapter[aria-pressed="true"] .number, .chapter[aria-pressed="true"] time { color: #b69b78; }
+.screening-foot { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 12px 18px;
+  border-top: 1px solid var(--line); background: #121215; }
+.transport { display: flex; align-items: center; gap: 6px; }
+.transport button { min-height: 34px; min-width: 44px; display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+  border: 1px solid #37333a; border-radius: 7px; background: #1c1a1f; color: #dfd9df; font: 400 13px var(--font); cursor: pointer; }
+.transport button:hover { border-color: #8c704a; background: #2d251b; color: #f5cf9d; }
+.transport svg { width: 15px; height: 15px; }
+.screening-links { display: flex; gap: 20px; align-items: center; font-size: 13px; }
+.screening-links a { color: #c5bdb3; text-decoration: none; }
+.screening-links a:hover { color: var(--accent); }
+.screening-caption { margin: 12px 2px 0; font-size: 13px; color: var(--muted); text-align: center; }
+.screening-meta .quality-note { color: #b3a697; font-size: 11.5px; line-height: 1.45; }
+@media (max-width: 1000px) {
+  .screening-head { flex-wrap: wrap; gap: 9px; }
+  .screening-meta { width: 100%; }
+  .screening-meta .quality-note { margin-right: auto; }
+}
+.tagline { text-align: center; max-width: 880px; margin: 30px auto 0; font-size: clamp(19px, 2.2vw, 25px); font-weight: 300; color: var(--text); line-height: 1.5; }
+.tagline em { font-style: normal; color: var(--accent); }
+button:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+@media (max-width: 640px) {
+  .screening-head { padding: 12px 14px; gap: 9px; }
+  .screening-title { font-size: 10px; letter-spacing: .1em; }
+  .screening-meta { width: 100%; font-size: 10px; gap: 7px; }
+  .screening-meta .quality-note { font-size: 10px; flex: 1; }
+  .screening-meta span + span { padding-left: 7px; }
+  .chapters { grid-template-columns: repeat(2, 1fr); }
+  .chapter { padding: 11px 14px; gap: 2px 8px; }
+  .chapter:nth-child(2) { border-right: 0; }
+  .chapter:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+  .chapter .chapter-name { font-size: 14px; }
+  .screening-foot { padding: 10px 12px; gap: 10px; }
+  .screening-links { gap: 12px; font-size: 12px; }
+  .screening-links .download { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { transition: none !important; } }
+
+/* synopsis cards */
+.stories { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 44px; }
+.story { display: flex; flex-direction: column; text-align: left; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+  overflow: hidden; cursor: pointer; font: inherit; color: inherit; padding: 0; transition: border-color .2s, transform .2s; }
+.story:hover { border-color: var(--line-strong); transform: translateY(-2px); }
+.story img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
+.story .body { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.story .top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.story .genre { font-size: 16.5px; font-weight: 500; color: var(--text); }
+.chip { font-size: 12.5px; font-weight: 400; color: var(--muted); border: 1px solid var(--line-strong); border-radius: 999px; padding: 0 9px; white-space: nowrap; }
+.story .syn { font-size: 14px; color: var(--muted); line-height: 1.55; }
+.story .go { margin-top: auto; padding-top: 6px; font-size: 14px; color: var(--accent); display: inline-flex; align-items: center; gap: 4px; }
+
+/* sections */
+section { padding: 104px 0; }
+section.band { background: rgba(17, 17, 21, .80); border-top: 1px solid rgba(255, 255, 255, .04); border-bottom: 1px solid rgba(255, 255, 255, .04); }
+h2 { font-size: 34px; font-weight: 500; color: #fff; text-align: center; letter-spacing: -.005em; }
+h2::after { content: ""; display: block; width: 36px; height: 2px; border-radius: 2px; background: var(--accent); margin: 16px auto 0; }
+.lead { text-align: center; color: var(--muted); max-width: 760px; margin: 20px auto 40px; font-size: 17px; }
+.abstract p { text-align: justify; hyphens: auto; margin-top: 18px; font-size: 17.5px; }
+.abstract p:first-of-type { margin-top: 30px; }
+.abstract em { font-style: normal; color: var(--accent); }
+
+/* method */
+.panel { background: #fff; border-radius: var(--radius); padding: 20px; box-shadow: 0 24px 60px -24px rgba(0, 0, 0, .9); }
+.panel img { width: 100%; height: auto; cursor: zoom-in; }
+.principles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 40px; }
+.principle { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; }
+.principle .badge { width: 42px; height: 42px; border-radius: 11px; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); }
+.principle .badge svg { width: 22px; height: 22px; }
+.principle h3 { margin-top: 16px; font-size: 19px; font-weight: 500; color: var(--text); }
+.principle p { margin-top: 8px; font-size: 15.5px; line-height: 1.65; }
+
+/* comparison */
+.controls { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.segmented { display: inline-flex; flex-wrap: wrap; justify-content: center; background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 4px; }
+.segmented button { border: 0; background: transparent; color: var(--muted); font: 400 15px var(--font); padding: 7px 18px; border-radius: 999px; cursor: pointer; transition: color .2s, background .2s; }
+.segmented button:hover { color: var(--text); }
+.segmented button[aria-pressed="true"] { background: #fff; color: #111; font-weight: 500; }
+.segmented.small button { font-size: 14px; padding: 5px 15px; }
+.synopsis-line { text-align: center; color: var(--body); font-size: 16.5px; max-width: 860px; margin: 18px auto 0; }
+.synopsis-line::before { content: "\201C"; color: var(--accent); } .synopsis-line::after { content: "\201D"; color: var(--accent); }
+.sync { display: flex; justify-content: center; gap: 20px; margin: 14px 0 22px; }
+.link-btn { display: inline-flex; align-items: center; gap: 6px; background: none; border: 0; color: var(--muted); font: 400 14.5px var(--font); cursor: pointer; transition: color .2s; }
+.link-btn:hover { color: var(--text); }
+.link-btn svg { width: 14px; height: 14px; }
+.grid6 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.tile { position: relative; border-radius: 10px; overflow: hidden; background: #000; box-shadow: 0 0 0 1px rgba(255, 255, 255, .07); }
+.tile video { width: 100%; aspect-ratio: 16 / 9; }
+.tile .label { position: absolute; top: 10px; left: 10px; display: flex; gap: 6px; pointer-events: none; }
+.tile .label span { background: rgba(0, 0, 0, .62); backdrop-filter: blur(6px); color: #fff; font-size: 13px; font-weight: 400; padding: 2px 10px; border-radius: 999px; }
+.tile.ours { box-shadow: 0 0 0 2px var(--accent); }
+.tile.ours .label .name { background: var(--accent); color: #1a1206; font-weight: 500; }
+.note { text-align: center; color: var(--muted); font-size: 14px; margin-top: 20px; }
+
+/* results */
+.highlights { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 40px; }
+.highlight { text-align: center; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px 14px 20px; }
+.highlight .value { font-size: 40px; font-weight: 500; color: #fff; line-height: 1.1; }
+.highlight .value small { font-size: 22px; color: var(--muted); font-weight: 300; }
+.highlight .label { margin-top: 8px; font-size: 14.5px; color: var(--muted); line-height: 1.45; }
+.table-card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px 18px 14px; overflow-x: auto; }
+table { border-collapse: collapse; min-width: 920px; width: 100%; font-size: 14.5px; font-variant-numeric: tabular-nums; }
+th, td { padding: 7px 8px; text-align: center; white-space: nowrap; }
+thead th { font-weight: 400; color: var(--muted); font-size: 13.5px; }
+thead tr.group th { font-size: 12.5px; letter-spacing: .04em; padding-bottom: 2px; }
+thead tr.group th.span { border-bottom: 1px solid var(--line-strong); }
+thead tr:last-child th { border-bottom: 1px solid var(--line-strong); padding-top: 6px; }
+td:first-child, th:first-child { text-align: left; }
+tbody td { border-top: 1px solid var(--line); color: var(--body); }
+tr.backbone td { color: var(--text); font-weight: 500; padding-top: 18px; border-top: 0; }
+tr.backbone td span { color: var(--muted); font-weight: 300; }
+tr.ours td { background: var(--accent-soft); color: var(--text); }
+tr.ours td:first-child { color: var(--accent); font-weight: 500; font-variant: small-caps; letter-spacing: .02em; border-radius: 6px 0 0 6px; }
+tr.ours td:last-child { border-radius: 0 6px 6px 0; }
+td.best { color: #fff; font-weight: 600; }
+td.second { text-decoration: underline; text-decoration-color: var(--muted); text-underline-offset: 4px; }
+
+/* resources */
+.resources { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.resource { display: flex; gap: 16px; align-items: flex-start; padding: 24px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+  text-decoration: none; transition: border-color .2s, transform .2s; }
+.resource:hover { border-color: var(--line-strong); transform: translateY(-2px); }
+.resource .badge { width: 42px; height: 42px; border-radius: 11px; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); flex: none; }
+.resource h3 { font-size: 18px; font-weight: 500; color: var(--text); }
+.resource p { margin-top: 4px; font-size: 14.5px; color: var(--muted); line-height: 1.55; }
+
+footer { text-align: center; color: var(--muted); font-size: 14px; padding: 40px 0 56px; border-top: 1px solid rgba(255, 255, 255, .05); }
+
+#lightbox { position: fixed; inset: 0; background: rgba(0, 0, 0, .92); display: none; align-items: center; justify-content: center; z-index: 30; padding: 24px; cursor: zoom-out; }
+#lightbox.open { display: flex; }
+#lightbox img { max-width: 100%; max-height: 100%; background: #fff; border-radius: 8px; }
+
+@media (max-width: 960px) {
+  .stories { grid-template-columns: repeat(2, 1fr); }
+  .principles, .resources { grid-template-columns: 1fr; }
+  .highlights { grid-template-columns: repeat(2, 1fr); }
+  .grid6 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 640px) {
+  .wrap { padding: 0 16px; }
+  nav .links { display: none; }
+  .hero { padding: 64px 0 32px; }
+  section { padding: 72px 0; }
+  .stories, .grid6 { grid-template-columns: 1fr; }
+  .abstract p { text-align: left; }
+  .panel { padding: 8px; }
+  h2 { font-size: 28px; }
+}
+
+/* Public author block and original-quality media. */
+.authors { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 25px; margin: 30px auto 12px; color: var(--text); font-size: 20px; font-weight: 400; }
+.authors span { white-space: nowrap; }
+.authors sup { color: var(--accent); font-size: 12px; margin-left: 3px; }
+.affiliations { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px 23px; max-width: 980px; margin: 0 auto; font-size: 15px; color: #aaaab5; line-height: 1.7; }
+.affiliations span { white-space: nowrap; }
+.affiliations sup { color: var(--accent); margin-right: 5px; font-size: 12px; }
+.chapter { grid-template-columns: 1fr; }
+.chapter time { font-size: 12px; }
+.tile .label span { font-size: 14px; }
+.grid6 > .tile:last-child { grid-column: 2; }
+@media (max-width: 960px) { .grid6 > .tile:last-child { grid-column: 1 / -1; width: calc((100% - 16px)/2); justify-self: center; } }
+@media (max-width: 640px) {
+  .authors { font-size: 17px; gap: 7px 18px; margin-top: 24px; }
+  .affiliations { font-size: 14px; flex-direction: column; gap: 3px; }
+  .grid6 > .tile:last-child { grid-column: auto; width: 100%; }
+  .screening-title { font-size: 12px; }
+  .screening-meta { font-size: 12px; }
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-file" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h6"/></symbol>
+  <symbol id="i-code" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></symbol>
+  <symbol id="i-film" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M7 3v18M17 3v18M2 8h5M2 13h5M2 18h5M17 8h5M17 13h5M17 18h5"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l10 5-10 5L2 7z"/><path d="M2 12l10 5 10-5M2 17l10 5 10-5"/></symbol>
+  <symbol id="i-scissors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4L8.12 15.88M14.47 14.48L20 20M8.12 8.12L12 12"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4l13 8-13 8z"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+</svg>
+
+<div class="ambient-lights" aria-hidden="true"><span class="ambient-light"></span><span class="ambient-light"></span><span class="ambient-light"></span><span class="ambient-light"></span><span class="ambient-light"></span></div>
+
+<nav>
+  <div class="wrap">
+    <a class="brand" href="#top"><img src="assets/logo.png" width="512" height="512" alt="">FilmHarness</a>
+    <div class="links">
+      <a href="#abstract">Abstract</a>
+      <a href="#method">Method</a>
+      <a href="#comparison">Comparison</a>
+      <a href="#results">Results</a>
+      <a href="#resources">Resources</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <h1><img class="hero-logo" src="assets/logo.png" width="512" height="512" alt=""><span>FilmHarness</span></h1>
+    <p class="subtitle">An Agentic Framework for Autonomous Film Generation</p>
+    <div class="authors" aria-label="Authors">
+      <span>Yiyun Zhou<sup>1,2</sup></span><span>Jingwei Shi<sup>3</sup></span><span>Ruijie Quan<sup>2</sup></span><span>Jingyuan Chen<sup>2</sup></span><span>Bo An<sup>1</sup></span>
+    </div>
+    <div class="affiliations" aria-label="Author affiliations"><span><sup>1</sup>Nanyang Technological University</span><span><sup>2</sup>Zhejiang University</span><span><sup>3</sup>Hong Kong Polytechnic University</span></div>
+    <div class="buttons">
+      <a class="btn primary" href="#comparison"><svg class="icon"><use href="#i-film"/></svg>Watch the Films</a>
+      <a class="btn" href="assets/paper/FilmHarness.pdf" target="_blank" rel="noopener"><svg class="icon"><use href="#i-file"/></svg>Paper</a>
+      <a class="btn" href="https://github.com/FilmHarness/FilmHarness" target="_blank" rel="noopener"><svg class="icon"><use href="#i-code"/></svg>Code</a>
+    </div>
+  </div>
+</header>
+
+<div class="wrap teaser">
+  <div class="screening" aria-label="FilmHarness selected sequences">
+    <div class="screening-head">
+      <span class="screening-title">FilmHarness / Selected sequences</span>
+      <div class="screening-meta"><span class="backbones">Four visual styles</span><span class="duration">01:00</span></div>
+    </div>
+    <video id="teaser-video" controls muted loop playsinline preload="metadata" poster="assets/poster_teaser.jpg" aria-label="FilmHarness teaser with playback and seek controls">
+      <source src="videos/teaser.mp4" type="video/mp4">
+      Your browser does not support embedded video. <a href="videos/teaser.mp4">Open the teaser</a>.
+    </video>
+    <div class="chapters" role="group" aria-label="Teaser chapters">
+      <button class="chapter" type="button" data-start="0" aria-pressed="true" aria-label="Documentary, jump to 0 seconds"><span class="chapter-name">Documentary</span><time>00:00</time></button>
+      <button class="chapter" type="button" data-start="15" aria-pressed="false" aria-label="Action, jump to 15 seconds"><span class="chapter-name">Action</span><time>00:15</time></button>
+      <button class="chapter" type="button" data-start="30" aria-pressed="false" aria-label="Stop-motion, jump to 30 seconds"><span class="chapter-name">Stop-motion</span><time>00:30</time></button>
+      <button class="chapter" type="button" data-start="45" aria-pressed="false" aria-label="Sci-fi anime, jump to 45 seconds"><span class="chapter-name">Sci-fi anime</span><time>00:45</time></button>
+    </div>
+    <div class="screening-foot">
+      <div class="transport" role="group" aria-label="Teaser playback">
+        <button type="button" data-seek="-5" aria-label="Back 5 seconds" title="Back 5 seconds">−5s</button>
+        <button type="button" id="teaser-toggle" aria-label="Pause teaser" title="Pause teaser"><svg class="icon"><use href="#i-pause"/></svg></button>
+        <button type="button" data-seek="5" aria-label="Forward 5 seconds" title="Forward 5 seconds">+5s</button>
+      </div>
+      <div class="screening-links"><a class="download" href="videos/teaser.mp4" download="FilmHarness_teaser.mp4">Download MP4</a><a href="#comparison">View complete films</a></div>
+    </div>
+  </div>
+  <p class="screening-caption">Selected excerpts from autonomously generated films using Wan2.2 and MiniMax H3.</p>
+  <p class="tagline">From a one-sentence synopsis, <span class="sc">FilmHarness</span> plans, synthesizes, verifies and assembles a
+    <em>long-form film</em> without human intervention.</p>
+  <div class="stories" id="stories"></div>
+</div>
+
+<section id="abstract">
+  <div class="wrap text abstract">
+    <h2>Abstract</h2>
+    <p>Recent video generation models synthesize high-quality short clips (e.g., 5–15 s), yet autonomous film generation remains challenging. Given a synopsis, an autonomous filmmaking system must coordinate screenplay development, character and scene design, and shot composition while maintaining consistency throughout a long-form film (e.g., three minutes). Since individual clips are generated stochastically, narrative coherence and cross-shot consistency depend on the <em>harness</em> that coordinates planning, synthesis, verification, and regeneration.</p>
+    <p>We present <span class="sc">FilmHarness</span>, a training-free, model-agnostic agentic harness for autonomous film generation. It establishes hierarchical typed contracts that specify narrative and visual constraints before content generation, compiles them into a dependency-aware task graph that decouples narrative shots from model-specific generation windows, and integrates multi-scale verification from keyframe pairs to the complete film. Verification feedback identifies the keyframes or video segments responsible for detected inconsistencies and guides selective regeneration of the affected units and their downstream dependents.</p>
+    <p>To ensure fair comparison, we evaluate <span class="sc">FilmHarness</span> alongside four multi-agent systems and two general coding agents using shared image and video foundation models with identical generation parameters. Across eight synopses with Wan2.2 and MiniMax H3, <span class="sc">FilmHarness</span> ranks first on 8 and 4 of 12 film-level metrics, respectively, and within the top two on 10 metrics with each backbone. Blind pairwise human evaluation yields preference rates of 88% for character consistency and 72% for overall quality after excluding ties. Ablation studies further show that reference conditioning improves identity preservation, verification reduces visual discontinuities, and explicit shot planning improves framing accuracy.</p>
+  </div>
+</section>
+
+<section id="method" class="band">
+  <div class="wrap">
+    <h2>Method</h2>
+    <p class="lead">FilmHarness treats film generation as harness design with language, image, vision-language and video foundation models.</p>
+    <div class="panel"><img src="assets/method_overview.png" alt="Overview of FilmHarness" loading="lazy"></div>
+    <div class="principles">
+      <div class="principle">
+        <span class="badge"><svg><use href="#i-layers"/></svg></span>
+        <h3>Contract-first planning</h3>
+        <p>The planner writes the story, screenplay, scene contracts and shot designs level by level. Review boards check each level and
+          revise only the flagged units, then the plan and its identity, wardrobe and location references are locked.</p>
+      </div>
+      <div class="principle">
+        <span class="badge"><svg><use href="#i-scissors"/></svg></span>
+        <h3>Window-decoupled compilation</h3>
+        <p>Each shot is split into micro-clips that fit the generation window of the video model. Adjacent micro-clips share a boundary
+          keyframe, and each keyframe pair keeps faces, wardrobe, props, set and grade fixed.</p>
+      </div>
+      <div class="principle">
+        <span class="badge"><svg><use href="#i-shield"/></svg></span>
+        <h3>Multi-scale verification</h3>
+        <p>Keyframes, pairs, clips, shots, scenes, reels and the film are verified in turn. A rejection names the responsible units, and
+          only those units and their dependents are regenerated.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="comparison">
+  <div class="wrap">
+    <h2>Comparison with Baselines</h2>
+    <p class="lead">All methods use the same synopses, image and video foundation models, and generation parameters. The four adapted multi-agent systems also share language and reviewer models. Codex and Claude Code each develop their own workflow. Sampling strategies remain method-specific, with generation costs reported in the paper.</p>
+    <div class="controls">
+      <div class="segmented" id="story-buttons" role="group" aria-label="Synopsis"></div>
+      <div class="segmented small" id="backbone-buttons" role="group" aria-label="Video backbone">
+        <button type="button" data-backbone="wan">Wan2.2</button><button type="button" data-backbone="h3">MiniMax H3</button>
+      </div>
+    </div>
+    <p class="synopsis-line" id="synopsis-line"></p>
+    <div class="sync">
+      <button class="link-btn" type="button" id="play-all"><svg><use href="#i-play"/></svg>Play all</button>
+      <button class="link-btn" type="button" id="pause-all"><svg><use href="#i-pause"/></svg>Pause all</button>
+    </div>
+    <div class="grid6" id="grid6"></div>
+    <p class="note">Open a film in fullscreen to inspect fine details.</p>
+  </div>
+</section>
+
+<section id="results" class="band">
+  <div class="wrap">
+    <h2>Quantitative Results</h2>
+    <p class="lead">Film-level metrics averaged over eight synopses. Bold marks the best and underline the second-best score.</p>
+    <div class="highlights">
+      <div class="highlight"><div class="value">8<small> / 12</small></div><div class="label">metrics ranked first with Wan2.2</div></div>
+      <div class="highlight"><div class="value">4<small> / 12</small></div><div class="label">metrics ranked first with MiniMax H3</div></div>
+      <div class="highlight"><div class="value">88%</div><div class="label">human preference for character consistency</div></div>
+      <div class="highlight"><div class="value">72%</div><div class="label">human preference for overall quality</div></div>
+    </div>
+    <div class="table-card">
+      <table id="results-table">
+        <thead>
+          <tr class="group"><th></th><th class="span" colspan="2">Judged consistency</th><th class="span" colspan="3">Face and global</th><th class="span" colspan="3">Sequence consistency</th><th class="span" colspan="3">Defects (%)</th><th class="span">Story</th></tr>
+          <tr><th>Method</th><th>Identity ↑</th><th>Location ↑</th><th>CS-FC ↑</th><th>WS-FC ↑</th><th>GC ↑</th><th>DINO ↑</th><th>CLIP ↑</th><th>DreamSim ↑</th><th>Hands ↓</th><th>Gaze ↓</th><th>Morph ↓</th><th>Beats ↑</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <p class="note">FilmHarness ranks within the top two on 10 of 12 metrics with each backbone. Human preference rates exclude ties across 96 comparisons with six baselines. Metric definitions, evaluation protocols, and ablation studies are provided in the paper.</p>
+  </div>
+</section>
+
+<section id="qualitative">
+  <div class="wrap">
+    <h2>Qualitative Comparison</h2>
+    <p class="lead">Eight sampled frames per method on the documentary synopsis with Wan2.2. FilmHarness preserves recurring characters and settings. The annotations highlight continuity errors and framing differences across the six baselines.</p>
+    <div class="panel"><img src="assets/qualitative_comparison.png" alt="Frames sampled from the documentary film of each method" loading="lazy"></div>
+  </div>
+</section>
+
+<section id="resources" class="band">
+  <div class="wrap">
+    <h2>Resources</h2>
+    <p class="lead">Explore the paper, original-quality films, and the repository for the forthcoming code release.</p>
+    <div class="resources">
+      <a class="resource" href="assets/paper/FilmHarness.pdf" target="_blank" rel="noopener"><span class="badge"><svg class="icon"><use href="#i-file"/></svg></span>
+        <div><h3>Paper</h3><p>The complete paper, including the method, experimental results, ablation studies, and supplementary details.</p></div></a>
+      <a class="resource" href="https://github.com/FilmHarness/FilmHarness" target="_blank" rel="noopener"><span class="badge"><svg class="icon"><use href="#i-code"/></svg></span>
+        <div><h3>Code</h3><p>Implementation and evaluation tools will be released in the official FilmHarness repository on GitHub.</p></div></a>
+      <a class="resource" href="#comparison"><span class="badge"><svg class="icon"><use href="#i-film"/></svg></span>
+        <div><h3>Videos</h3><p>Original-quality films from FilmHarness and six baselines across four synopses and both video backbones.</p></div></a>
+    </div>
+  </div>
+</section>
+
+<footer><span class="sc">FilmHarness</span><br>Autonomous Film Generation</footer>
+
+<div id="lightbox" role="dialog" aria-label="Enlarged figure"><img alt=""></div>
+
+<script>
+(function () {
+  // CSS keeps pulsing indefinitely, even when the title leaves the viewport.
+  var ambientMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  var glowColors = ["242, 179, 90", "164, 127, 250", "91, 163, 241", "83, 208, 183", "233, 129, 188"];
+  function randomBetween(min, max) { return min + Math.random() * (max - min); }
+  Array.from(document.querySelectorAll(".ambient-light")).forEach(function (node, index) {
+    function varyGlow(first) {
+      node.style.setProperty("--glow", glowColors[first ? index : Math.floor(Math.random() * glowColors.length)]);
+      if (!ambientMotion.matches) {
+        node.style.left = randomBetween(-22, 75) + "%";
+        node.style.top = randomBetween(-32, 68) + "%";
+        node.style.setProperty("--drift-x", randomBetween(-85, 85) + "px");
+        node.style.setProperty("--drift-y", randomBetween(-65, 65) + "px");
+      }
+    }
+    varyGlow(true);
+    node.addEventListener("animationiteration", function () { varyGlow(false); });
+  });
+
+  var teaser = document.getElementById("teaser-video");
+  var chapterButtons = Array.from(document.querySelectorAll(".chapter"));
+  var toggle = document.getElementById("teaser-toggle");
+  function seekTeaser(seconds, absolute) {
+    function applySeek() {
+      if (!Number.isFinite(teaser.duration)) return;
+      teaser.currentTime = Math.max(0, Math.min(teaser.duration - 0.05, absolute ? seconds : teaser.currentTime + seconds));
+      updateTeaser();
+    }
+    if (teaser.readyState >= 1) applySeek();
+    else teaser.addEventListener("loadedmetadata", applySeek, {once: true});
+  }
+  function updateTeaser() {
+    var current = Math.min(3, Math.floor(teaser.currentTime / 15));
+    chapterButtons.forEach(function (button, i) { button.setAttribute("aria-pressed", String(i === current)); });
+    var paused = teaser.paused;
+    toggle.setAttribute("aria-label", paused ? "Play teaser" : "Pause teaser");
+    toggle.title = paused ? "Play teaser" : "Pause teaser";
+    toggle.querySelector("use").setAttribute("href", paused ? "#i-play" : "#i-pause");
+  }
+  chapterButtons.forEach(function (button) {
+    button.addEventListener("click", function () {
+      seekTeaser(Number(button.dataset.start), true);
+      var play = teaser.play(); if (play) play.catch(function () {});
+    });
+  });
+  document.querySelectorAll("[data-seek]").forEach(function (button) {
+    button.addEventListener("click", function () { seekTeaser(Number(button.dataset.seek), false); });
+  });
+  toggle.addEventListener("click", function () {
+    if (teaser.paused) { var play = teaser.play(); if (play) play.catch(function () {}); }
+    else teaser.pause();
+  });
+  ["timeupdate", "play", "pause", "loadedmetadata", "seeked"].forEach(function (event) { teaser.addEventListener(event, updateTeaser); });
+  if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) { var initialPlay = teaser.play(); if (initialPlay) initialPlay.catch(function () {}); }
+  updateTeaser();
+
+  // Tab. 2 of the paper; null denotes an undefined metric.
+  var DIRECTION = [1, 1, 1, 1, 1, 1, 1, 1, -1, -1, -1, 1];
+  var DECIMALS = [3, 3, 3, 3, 3, 3, 3, 3, 1, 1, 1, 0];
+  var TABLE = [
+    ["Wan2.2", "first-last-frame, 5 s window, 16 fps", [
+      ["VGoT", 0.938, null, 0.150, 0.842, 0.406, 0.419, 0.721, 0.486, 1.9, 18.3, 34.2, 94],
+      ["MovieAgent", 0.968, 0.131, 0.163, 0.856, 0.369, 0.368, 0.640, 0.440, 2.4, 39.8, 22.6, 83],
+      ["ViMax", 0.832, 0.201, 0.110, 0.846, 0.346, 0.241, 0.638, 0.321, 4.9, 23.3, 48.3, 98],
+      ["AniMaker", 0.949, 0.829, 0.501, 0.819, 0.512, 0.531, 0.775, 0.591, 3.1, 22.2, 55.0, 92],
+      ["Codex", 0.967, 0.410, 0.181, 0.815, 0.569, 0.547, 0.802, 0.613, 0.0, 7.3, 26.4, 98],
+      ["Claude Code", 0.986, 0.774, 0.338, 0.882, 0.492, 0.395, 0.725, 0.478, 0.3, 30.2, 17.7, 100],
+      ["FilmHarness", 0.967, 0.923, 0.434, 0.896, 0.583, 0.622, 0.810, 0.661, 0.7, 8.9, 8.2, 100]]],
+    ["MiniMax H3", "first-last-frame, 5 s window, 24 fps", [
+      ["VGoT", 0.849, null, 0.166, 0.934, 0.414, 0.417, 0.712, 0.494, 0.8, 20.0, 13.3, 100],
+      ["MovieAgent", 0.889, 0.096, 0.195, 0.933, 0.342, 0.356, 0.629, 0.434, 1.1, 34.8, 13.3, 92],
+      ["ViMax", 0.854, 0.302, 0.142, 0.935, 0.358, 0.248, 0.640, 0.331, 2.4, 25.0, 19.4, 98],
+      ["AniMaker", 0.963, 0.898, 0.628, 0.924, 0.496, 0.562, 0.773, 0.614, 1.0, 5.6, 11.1, 81],
+      ["Codex", 0.952, 0.694, 0.268, 0.932, 0.659, 0.554, 0.796, 0.616, 0.7, 11.5, 5.2, 98],
+      ["Claude Code", 0.986, 0.965, 0.254, 0.939, 0.578, 0.542, 0.797, 0.623, 1.7, 27.8, 0.7, 100],
+      ["FilmHarness", 0.977, 0.961, 0.464, 0.963, 0.588, 0.618, 0.811, 0.662, 1.7, 7.5, 2.1, 96]]]
+  ];
+  var body = document.querySelector("#results-table tbody");
+  TABLE.forEach(function (block) {
+    var head = document.createElement("tr"); head.className = "backbone";
+    var cell = document.createElement("td"); cell.colSpan = 13;
+    cell.innerHTML = block[0] + " <span>&nbsp;" + block[1] + "</span>";
+    head.appendChild(cell); body.appendChild(head);
+    var rows = block[2];
+    var orders = DIRECTION.map(function (dir, c) {
+      var seen = [];
+      rows.forEach(function (r) { if (r[c + 1] !== null) { var t = r[c + 1].toFixed(DECIMALS[c]); if (seen.indexOf(t) < 0) seen.push(t); } });
+      return seen.sort(function (a, b) { return dir * (parseFloat(b) - parseFloat(a)); });
+    });
+    rows.forEach(function (r) {
+      var tr = document.createElement("tr"); if (r[0] === "FilmHarness") tr.className = "ours";
+      var name = document.createElement("td"); name.textContent = r[0]; tr.appendChild(name);
+      DIRECTION.forEach(function (_, c) {
+        var td = document.createElement("td"); var v = r[c + 1];
+        if (v === null) td.textContent = "–";
+        else {
+          var t = v.toFixed(DECIMALS[c]); td.textContent = t;
+          if (t === orders[c][0]) td.className = "best"; else if (orders[c].length > 1 && t === orders[c][1]) td.className = "second";
+        }
+        tr.appendChild(td);
+      });
+      body.appendChild(tr);
+    });
+  });
+
+  // Four synopses, two backbones, and seven methods.
+  var STORIES = [
+    {label: "Documentary", featured: "wan", ids: {wan: "documentary_wan22", h3: "documentary_minimax_h3"},
+     synopsis: "A team of marine biologists travels to the melting Arctic to track the last group of polar bears and record their plight."},
+    {label: "Action", featured: "h3", ids: {wan: "action_wan22", h3: "action_minimax_h3"},
+     synopsis: "An elite mercenary discovers that the targets of her clean-up mission are innocent civilians. She turns against her employer and leads them out of the war zone."},
+    {label: "Stop-motion", featured: "wan", ids: {wan: "stop_motion_wan22", h3: "stop_motion_minimax_h3"},
+     synopsis: "A small puppet made of scrap wakes up in a city landfill and leads discarded toys to build a new home from waste."},
+    {label: "Sci-fi anime", featured: "h3", ids: {wan: "scifi_anime_wan22", h3: "scifi_anime_minimax_h3"},
+     synopsis: "A boy from the wealthy upper city strays into the barren lower district and joins a local girl to bring control of clean water to everyone."}
+  ];
+  var BACKBONE = {wan: "Wan2.2", h3: "MiniMax H3"};
+  var METHODS = [["codex", "Codex"], ["claude_code", "Claude Code"], ["animaker", "AniMaker"],
+                 ["vimax", "ViMax"], ["movieagent", "MovieAgent"], ["vgot", "VGoT"], ["filmharness", "FilmHarness"]];
+  var storyButtons = document.getElementById("story-buttons");
+  var backboneButtons = document.querySelectorAll("#backbone-buttons button");
+  var grid = document.getElementById("grid6");
+  var state = {story: 0, backbone: "wan"};
+
+  function show() {
+    var story = STORIES[state.story], id = story.ids[state.backbone];
+    storyButtons.querySelectorAll("button").forEach(function (b, i) { b.setAttribute("aria-pressed", String(i === state.story)); });
+    backboneButtons.forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.backbone === state.backbone)); });
+    document.getElementById("synopsis-line").textContent = story.synopsis;
+    grid.querySelectorAll("video").forEach(function (v) { v.pause(); v.removeAttribute("src"); v.load(); });
+    grid.innerHTML = "";
+    METHODS.forEach(function (m) {
+      var ours = m[0] === "filmharness";
+      var tile = document.createElement("div"); tile.className = "tile" + (ours ? " ours" : "");
+      var video = document.createElement("video");
+      video.controls = true; video.muted = true; video.preload = "none"; video.playsInline = true;
+      video.setAttribute("aria-label", m[1] + ": " + story.label + " (" + BACKBONE[state.backbone] + ")");
+      video.poster = ours ? "assets/poster_" + id + ".jpg" : "assets/baselines/" + id + "__" + m[0] + ".jpg";
+      video.src = ours ? "videos/" + id + ".mp4" : "videos/baselines/" + id + "__" + m[0] + ".mp4";
+      var label = document.createElement("div"); label.className = "label";
+      var name = document.createElement("span"); name.className = "name"; name.textContent = m[1];
+      label.appendChild(name);
+      tile.appendChild(video); tile.appendChild(label); grid.appendChild(tile);
+    });
+  }
+  STORIES.forEach(function (story, i) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = story.label;
+    b.addEventListener("click", function () { state.story = i; show(); });
+    storyButtons.appendChild(b);
+  });
+  backboneButtons.forEach(function (b) { b.addEventListener("click", function () { state.backbone = b.dataset.backbone; show(); }); });
+  show();
+
+  // Synopsis cards under the teaser open the corresponding comparison.
+  var cards = document.getElementById("stories");
+  STORIES.forEach(function (story, i) {
+    var card = document.createElement("button"); card.type = "button"; card.className = "story";
+    card.innerHTML = '<img alt="" loading="lazy" src="assets/poster_' + story.ids[story.featured] + '.jpg">' +
+      '<div class="body"><div class="top"><span class="genre"></span><span class="chip"></span></div><p class="syn"></p>' +
+      '<span class="go">Watch and compare</span></div>';
+    card.querySelector(".genre").textContent = story.label;
+    card.querySelector(".chip").textContent = BACKBONE[story.featured];
+    card.querySelector(".syn").textContent = story.synopsis;
+    card.addEventListener("click", function () {
+      state.story = i; state.backbone = story.featured; show();
+      document.getElementById("comparison").scrollIntoView({behavior: "smooth"});
+    });
+    cards.appendChild(card);
+  });
+
+  document.getElementById("play-all").addEventListener("click", function () {
+    grid.querySelectorAll("video").forEach(function (v) { v.currentTime = 0; var p = v.play(); if (p) p.catch(function () {}); });
+  });
+  document.getElementById("pause-all").addEventListener("click", function () { grid.querySelectorAll("video").forEach(function (v) { v.pause(); }); });
+
+  // Click a figure to enlarge it.
+  var box = document.getElementById("lightbox");
+  document.querySelectorAll(".panel img").forEach(function (img) {
+    img.addEventListener("click", function () { box.querySelector("img").src = img.src; box.classList.add("open"); });
+  });
+  box.addEventListener("click", function () { box.classList.remove("open"); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") box.classList.remove("open"); });
+})();
+</script>
+</body>
+</html>
